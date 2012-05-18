@@ -14,7 +14,8 @@
   },
   "devDependencies": {
     "mocha": "*",
-    "should": "*"
+    "should": "*",
+    "optimist": "*"
   },
   "optionalDependencies": {},
   "engines": {
@@ -29,5 +30,8 @@
   "license": {
     "type": "MIT",
     "url": "https://raw.github.com/kevinohara80/nforce/master/LICENSE"
+  },
+  "bin": {
+    "nforce-query": "bin/query.js"
   }
 }
