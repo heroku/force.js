@@ -32,6 +32,6 @@
     "url": "https://raw.github.com/kevinohara80/nforce/master/LICENSE"
   },
   "bin": {
-    "nforce-query": "bin/query.js"
+    "nforce": "bin/cli.js"
   }
 }
