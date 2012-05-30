@@ -2,7 +2,6 @@
 
 var nforce = require('../');
 var fs = require('fs');
-
 var optimist = require('optimist');
 
 var argv = optimist
@@ -18,7 +17,7 @@ var argv = optimist
     '  $0 query    ::  execute a SOQL query',
     '  $0 version  ::  show your nforce version',
     '',
-    '-> for specific command help type `nforce help [command]`'
+    'for specific command help type `nforce help [command]`'
   ].join('\r\n'))
   .argv
 ;
