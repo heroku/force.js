@@ -6,6 +6,7 @@ var optimist = require('optimist');
 var mkdirp = require('mkdirp');
 var fs = require('fs');
 var path = require('path');
+var _ = require('underscore');
 
 var dir = process.env.HOME + '/.nforce';
 var file = dir + '/config.json';
@@ -74,20 +75,42 @@ function handleConfig() {
         username: argv.u,
         password: argv.p,
         securityToken: argv.t || null,
+        environment: (argv.e == 'sandbox') ? 'sandbox' : 'production',
         oauth: {}
       }
+      
+      var indicies = [];
+      
+      if(cfg.orgs.length) {
+        for(var i=0; i<cfg.orgs.length; i++) {
+          if(cfg.orgs[i].nickname == org.nickname) {
+            indicies.push(i);
+          }
+        }
+      }
+      
+      // switch to sandbox if this is selected
+      if(org.environment == 'sandbox') conn.environment == 'sandbox';
       
       console.log('[NFORCE] -> attempting to authenticate');
       
       conn.authenticate(org, function(err, resp) {
         if(err) return console.error('[NFORCE] -> could not authenticate: ' + err.message);
         
+        var offset = 0;
+        if(indicies.length) {
+          for(var i=0; i<indicies.length; i++) {
+            cfg.orgs.splice(indicies[i - offset], 1);
+            offset++;
+          }
+        }
+        
         org.oauth = resp;
         cfg.orgs.push(org);
 
         saveConfig(cfg, function(err) {
           if(err) return console.error('Problem saving config: ' + err.message);
-          console.log('New org (' + org.nickname + ') was created.');
+          console.log('[NFORCE] -> New org (' + org.nickname + ') was created.');
         });
         
       });
