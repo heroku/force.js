@@ -18,6 +18,12 @@ nforce
 $ npm install nforce
 ```
 
+...or if you want to use the cli, install globally
+
+```bash
+$ npm install -g nforce
+```
+
 ## Usage
 
 Require **nforce** in your app and create a connection to an org.
