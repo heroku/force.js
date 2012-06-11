@@ -3,6 +3,18 @@
 var nforce = require('../');
 var fs = require('fs');
 var optimist = require('optimist');
+var mkdirp = require('mkdirp');
+var fs = require('fs');
+var path = require('path');
+
+var dir = process.env.HOME + '/.nforce';
+var file = dir + '/config.json';
+
+var conn = nforce.createConnection({
+  clientId: '3MVG9rFJvQRVOvk5nd6A4swCyck.4BFLnjFuASqNZmmxzpQSFWSTe6lWQxtF3L5soyVLfjV3yBKkjcePAsPzi',
+  clientSecret: '9154137956044345875',
+  redirectUri: 'http://localhost:3000/oauth/_callback'
+});
 
 var argv = optimist
   .usage([
@@ -25,7 +37,7 @@ var argv = optimist
 var cmd = argv._[0];
 
 if(cmd == 'version') {
-  console.log('nforce version ' + nforce.version);
+  console.log('nforce v' + nforce.version);
 } else if (cmd == 'help') {
   if(argv._[1]) {
     var helpCmd = argv._[1];
@@ -34,10 +46,7 @@ if(cmd == 'version') {
     optimist.showHelp();
   }
 } else if(cmd == 'config') {
-  fs.open(__dirname + '/nforce.json', 'w+', function(err, file) {
-    if(err) return console.log('error accessing file');
-    console.log(__dirname + '/nforce.json');
-  });
+  handleConfig();
 } else if(cmd == 'query') {
   var config = fs.openSync(__dirname + '/nforce.json', 'w+');
   console.log(config);
@@ -47,6 +56,73 @@ if(cmd == 'version') {
     console.log(' ');
   }
   optimist.showHelp();
+}
+
+function handleConfig() {
+  loadConfig(function(err, cfg) {
+    if(err) return console.error('Problem loading config: ' + err.message);
+    
+    var mod = argv._[1];
+    
+    if(mod == 'add-org') {
+      if(!argv.u || ! argv.p || !argv.n) {
+        return console.log('invalid information to add org');
+      }
+      
+      var org = {
+        nickname: argv.n,
+        username: argv.u,
+        password: argv.p,
+        securityToken: argv.t || null,
+        oauth: {}
+      }
+      
+      console.log('[NFORCE] -> attempting to authenticate');
+      
+      conn.authenticate(org, function(err, resp) {
+        if(err) return console.error('[NFORCE] -> could not authenticate: ' + err.message);
+        
+        org.oauth = resp;
+        cfg.orgs.push(org);
+
+        saveConfig(cfg, function(err) {
+          if(err) return console.error('Problem saving config: ' + err.message);
+          console.log('New org (' + org.nickname + ') was created.');
+        });
+        
+      });
+      
+    }
+    
+  });
+}
+
+function loadConfig(cb) {
+  mkdirp(dir, function (err) {
+    if(err) return cb(err, null);
+    path.exists(file, function (ex) {
+      if(!ex) {
+        var cfg = {
+          orgs: []
+        }
+        saveConfig(cfg, function() {
+          cb(null, cfg);
+        });
+      } else {
+        fs.readFile(file, function(err, data) {
+          if(err) cb(err, null);
+          cb(null, JSON.parse(data));
+        });
+      }
+    });
+  });
+}
+
+function saveConfig(cfg, cb) {
+  fs.writeFile(file, JSON.stringify(cfg, null, ' ') + '\n' , function(err) {
+    if(err) return cb(err);
+    cb(null);
+  });
 }
 
 
