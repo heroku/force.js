@@ -295,6 +295,11 @@ Get a REST API resource by its url. `url` should be a REST API resource.
 * Continue with caching capabilities for describe/metadata calls
 * Chatter support
 
+## Contributors
+
+* Kevin O'Hara [kevinohara80](https://github.com/kevinohara80)
+* Jeff Douglas [jeffdonthemic](https://github.com/jeffdonthemic)
+
 ## Changelog
 
 * `v0.1.0`: Releasing 0.1.0!
