@@ -1,33 +1,31 @@
-nforce :: node.js salesforce REST API wrapper
-======
+# force.js 
+## node.js Force.com API
 
-[![Build Status](https://secure.travis-ci.org/kevinohara80/nforce.png)](http://travis-ci.org/kevinohara80/nforce)  
-
-**nforce** is node.js a REST API wrapper for force.com, database.com, and salesforce.com.
+**force** is node.js a REST API wrapper for force.com, database.com, and salesforce.com.
 
 ## Features
 
-* Simple api
-* Intelligent sObjects
-* Helper OAuth methods
-* Simple streaming
-* Multi-user design with single user mode
-* Express middleware
+- Simple API
+- Intelligent sObjects
+- Helper OAuth methods
+- Simple streaming
+- Multi-user design with single user mode
+- Express middleware
 
 ## Installation
 
 ```bash
-$ npm install nforce
+$ npm install force
 ```
 
 ## Usage
 
-Require **nforce** in your app and create a client connection to a Salesforce Remote Access Application.
+Require **force** in your app and create a client connection to a Salesforce Remote Access Application.
 
 ```js
-var nforce = require('nforce');
+var force = require('force');
 
-var org = nforce.createConnection({
+var org = force.createConnection({
   clientId: 'SOME_OAUTH_CLIENT_ID',
   clientSecret: 'SOME_OAUTH_CLIENT_SECRET',
   redirectUri: 'http://localhost:3000/oauth/_callback',
@@ -58,10 +56,10 @@ org.authenticate({ username: 'my_test@gmail.com', password: 'mypassword'}, funct
 });
 ```
 
-Now we can go nuts. **nforce** has an salesforce sObject factory method that creates records for you. Let's use that and insert a record...
+Now we can go nuts. **force** has an salesforce sObject factory method that creates records for you. Let's use that and insert a record...
 
 ```js
-var acc = nforce.createSObject('Account');
+var acc = force.createSObject('Account');
 acc.Name = 'Spiffy Cleaners';
 acc.Phone = '800-555-2345';
 acc.SLA__c = 'Gold';
@@ -79,7 +77,7 @@ org.insert(acc, function(err, resp){
 });
 ```
 
-Querying and updating records is super easy. **nforce** wraps API-queried records in a special object. The object caches field updates that you make to the record and allows you to pass the record directly into the update method without having to scrub out the unchanged fields. In the example below, only the Name and Industry fields will be sent in the update call despite the fact that the query returned other fields such as BillingCity and CreatedDate.
+Querying and updating records is super easy. **force** wraps API-queried records in a special object. The object caches field updates that you make to the record and allows you to pass the record directly into the update method without having to scrub out the unchanged fields. In the example below, only the Name and Industry fields will be sent in the update call despite the fact that the query returned other fields such as BillingCity and CreatedDate.
 
 ```js
 var q = 'SELECT Id, Name, CreatedDate, BillingCity FROM Account WHERE Name = "Spiffy Cleaners" LIMIT 1';
@@ -112,7 +110,7 @@ $ node examples/crud.js
 
 ## Authentication
 
-**nforce** supports two Salesforce OAuth 2.0 flows, username/password and authorization code. 
+**force** supports two Salesforce OAuth 2.0 flows, username/password and authorization code. 
 
 ### Username/Password flow
 
@@ -133,7 +131,7 @@ org.authenticate({ username: 'my_test@gmail.com', password: 'mypassword'}, funct
 
 ### Authorization Code Flow
 
-To perform an authorization code flow, first redirect users to the Authorization URI at Salesforce. **nforce** provides a helper function to build this url for you.
+To perform an authorization code flow, first redirect users to the Authorization URI at Salesforce. **force** provides a helper function to build this url for you.
 
 ```js
 org.getAuthUri()
@@ -160,14 +158,13 @@ At the end of a successful authorization, you a returned an OAuth object for the
 
 ### OAuth Object De-Coupling (Multi-user mode)
 
-**nforce** decouples the oauth credentials from the connection object when `mode` is set to `multi` so that in a multi-user situation, a separate connection object doesn't need to be created for each user. This makes the module more efficient. Essentially, you only need one connection object for multiple users and pass the OAuth object in with the request. In this scenario, it makes the most sense to store the OAuth credentials in the users session or in some other data store. If you are using [express](https://github.com/visionmedia/express), **nforce** can take care of storing this for you (see Express Middleware).
+**force.js** decouples the oauth credentials from the connection object when `mode` is set to `multi` so that in a multi-user situation, a separate connection object doesn't need to be created for each user. This makes the module more efficient. Essentially, you only need one connection object for multiple users and pass the OAuth object in with the request. In this scenario, it makes the most sense to store the OAuth credentials in the users session or in some other data store. If you are using [express](https://github.com/visionmedia/express), **force.js** can take care of storing this for you (see Express Middleware).
 
 ### Integrated OAuth Object (Single-user mode)
 
 If you specified `single` as your `mode` when creating the connection, calling authenticate will store the OAuth object within the connection object. Then, in subsequent API requests, you can simply omit the OAuth object from the request like so.
 
 ```js
-// look ma, no oauth argument!
 org.query('SELECT Id FROM Lead LIMIT 1', function(err, res) {
   if(err) return console.error(err);
   else return console.log(res.records[0]);
@@ -178,7 +175,7 @@ org.query('SELECT Id FROM Lead LIMIT 1', function(err, res) {
 
 ### Express Middleware
 
-**nforce** has built-in support for [express](https://github.com/visionmedia/express) using the express/connect middleware system. The middleware handles the oauth callbacks for you and automatically stores the OAuth credentials in the user's session. Therefore, to use the middleware you must have sessions enabled in your express configuration.
+**force** has built-in support for [express](https://github.com/visionmedia/express) using the express/connect middleware system. The middleware handles the oauth callbacks for you and automatically stores the OAuth credentials in the user's session. Therefore, to use the middleware you must have sessions enabled in your express configuration.
 
 ```js
 app.configure(function(){
@@ -187,8 +184,8 @@ app.configure(function(){
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(express.cookieParser());
-  app.use(express.session({ secret: 'nforce testing baby' }));
-  app.use(org.expressOAuth({onSuccess: '/home', onError: '/oauth/error'}));  // <--- nforce middleware
+  app.use(express.session({ secret: 'force testing baby' }));
+  app.use(org.expressOAuth({onSuccess: '/home', onError: '/oauth/error'}));  // <--- force middleware
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
 });
@@ -206,9 +203,9 @@ app.get('ajax/cases', function(req, res) {
 
 ### Streaming API Responses
 
-Under the covers, **nforce** leverages [request](https://github.com/mikeal/request) for all http requests to the Salesforce REST API. **request** returns a readable stream that can be used to pipe the data to a writable stream.
+Under the covers, **force** leverages [request](https://github.com/mikeal/request) for all http requests to the Salesforce REST API. **request** returns a readable stream that can be used to pipe the data to a writable stream.
 
-Here is an example of piping an nforce api request for the binary data of an Attachment directly to the response object in an http server.
+Here is an example of piping an force api request for the binary data of an Attachment directly to the response object in an http server.
 
 ```js
 var http = require('http');
@@ -243,7 +240,7 @@ org.query(query, req.session.oauth, callback(err, resp) {
 });
 ```
 
-Like other API requests, **nforce** query method returns a node stream. By calling the `pipe` method on this object, your query call will automatically start streaming ALL of the records from your query in 2000 record batches.
+Like other API requests, **force** query method returns a node stream. By calling the `pipe` method on this object, your query call will automatically start streaming ALL of the records from your query in 2000 record batches.
 
 ```js
 // dataset of 50k records.
@@ -253,7 +250,7 @@ org.query(query, req.session.oauth).pipe(res); // streaming all 50k records
 
 ### Force.com Streaming API Support
 
-**nforce** supports the Force.com Streaming API. Connecting to one of your PushTopics is easy using the node.js EventEmitter interface.
+**force** supports the Force.com Streaming API. Connecting to one of your PushTopics is easy using the node.js EventEmitter interface.
 
 ```js
 org.authenticate({ username: user, password: pass }, function(err, oauth) {
@@ -278,11 +275,11 @@ org.authenticate({ username: user, password: pass }, function(err, oauth) {
 });
 ```
 
-## nforce API Basics
+## force.js API Basics
 
 ### Callbacks
 
-The API of **nforce** follows typical node.js standards. Callbacks will always pass an optional error object, and a response object. The response object closely resembles the typical responses from the Salesforce REST API.
+The API of **force** follows typical node.js standards. Callbacks will always pass an optional error object, and a response object. The response object closely resembles the typical responses from the Salesforce REST API.
 
 ```js
 callback(err, resp);
@@ -295,14 +292,14 @@ Most of the org methods take a callback, but also return a stream. This is usefu
 ```js
 var so = fs.createWriteStream('sobjects.txt', {'flags': 'a'});
 
-org.getSObjects(oauth).pipe(so);  
+org.getSObjects(oauth).pipe(so);
 ```
 
-## nforce Base Methods
+## force Base Methods
 
 ### createConnection(opts)
 
-The createConnection method creates an *nforce* salesforce connection object. You need to supply some arguments including oauth information and some optional arguments for version and salesforce environment type. 
+The createConnection method creates an *force* salesforce connection object. You need to supply some arguments including oauth information and some optional arguments for version and salesforce environment type. 
 
 * `clientId`: Required. This is the OAuth client id
 * `clientSecret`: Required. This is the OAuth client secret
@@ -332,7 +329,7 @@ Returns the sObjects Id (if set)
 
 ## Connection Methods
 
-The following list of methods are available for an **nforce** connection object:
+The following list of methods are available for an **force** connection object:
 
 ### getAuthUri([opts])
 
@@ -448,57 +445,23 @@ A restRequest has the following properties
 * `urlParams`: (Array) Optional - URL parmams in an array of [{key:'key', value:'value'}]
 
 ```js
-org.apexRest({uri:'test', method: 'POST', body: body, urlParams: urlParams}, req.session.oauth, function(err,resp){
-    if(!err) {
-      console.log(resp);
-      res.send(resp);
-    }else{
-      console.log(err);
-      res.send(err);
-    }
-  })
+org.apexRest({uri:'test', method: 'POST', body: body, urlParams: urlParams}, req.session.oauth, function(err,resp) {
+  if(!err) {
+    console.log(resp);
+    res.send(resp);
+  } else {
+    console.log(err);
+    res.send(err);
+  }
+});
 ```
-
-## Todo
-
-* **nforce** cli implementation
-* Continue with caching capabilities for describe/metadata calls
-* Chatter support
-* Tooling API
 
 ## Contributors
 
-* Kevin O'Hara -> [kevinohara80](https://github.com/kevinohara80)
-* Jeff Douglas -> [jeffdonthemic](https://github.com/jeffdonthemic)
-* Zach McElrath -> [zachelrath](https://github.com/zachelrath)
-* Chris Bland -> [chrisbland](https://github.com/chrisbland)
-* Jeremy Neander -> [jneander](https://github.com/jneander)
-* Austin McDaniel -> [amcdaniel2](https://github.com/amcdaniel2)
-* Chris Hickman -> [chrishic](https://github.com/chrishic)
-
-## Changelog
-
-* `v0.5.1`: Fix a bug in getVersions for single user mode
-* `v0.5.0`: Safer error handling. OAuth extra param support.
-* `v0.4.4`: Fixes query stream issues
-* `v0.4.3`: Fix express oauth issue. Whoops, my bad!
-* `v0.4.2`: Fix for upsert issue
-* `v0.4.1`: Bug fix for handling SFDC 500 response
-* `v0.4.0`: Single user mode
-* `v0.3.1`: Documentation updates.
-* `v0.3.0`: Blob support. API request streaming.
-* `v0.2.5`: Patches for Apex Rest
-* `v0.2.4`: Small bug fixes
-* `v0.2.3`: Apex Rest support
-* `v0.2.2`: Added loginUri override support
-* `v0.2.1`: API version bump
-* `v0.2.0`: Adding streaming support
-* `v0.1.1`: Fixes auth error handling bug
-* `v0.1.0`: Releasing 0.1.0!
-* `v0.0.7`: Bug fixes
-* `v0.0.6`: Query streaming
-* `v0.0.5`: Bug fixes
-* `v0.0.4`: Initialization of SObject now has field setting option
-* `v0.0.3`: API overhaul. Implemented Record class with field update caching
-* `v0.0.2`: Testing framework implemented. Bug fixes.
-* `v0.0.1`: Initial release. OAuth, CRUD, describes
+* [Kevin O'Hara](https://github.com/kevinohara80)
+* [Jeff Douglas](https://github.com/jeffdonthemic)
+* [Zach McElrath](https://github.com/zachelrath)
+* [Chris Bland](https://github.com/chrisbland)
+* [Jeremy Neander](https://github.com/jneander)
+* [Austin McDaniel](https://github.com/amcdaniel2)
+* [Chris Hickman](https://github.com/chrishic)
