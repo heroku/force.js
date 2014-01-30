@@ -1,5 +1,7 @@
 # force.js 
-## node.js Force.com API
+
+## NOTE: This library is now deprecated. Please use the Nforce https://github.com/kevinohara80/nforce library instead.
+
 
 **force** is node.js a REST API wrapper for force.com, database.com, and salesforce.com.
 
