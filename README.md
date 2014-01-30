@@ -1,6 +1,6 @@
 # force.js 
 
-## NOTE: This library is now deprecated. Please use the Nforce https://github.com/kevinohara80/nforce library instead.
+## NOTE: This library is now deprecated. Please use the [Nforce](https://npmjs.org/package/nforce) (https://github.com/kevinohara80/nforce) library instead.
 
 
 **force** is node.js a REST API wrapper for force.com, database.com, and salesforce.com.
