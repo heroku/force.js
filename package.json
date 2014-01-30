@@ -2,7 +2,7 @@
   "author": "Kevin O'Hara <kevnohara80@gmail.com> (http://kevinmohara.com)",
   "name": "force",
   "description": "force.js is a REST API wrapper for force.com, database.com, and salesforce.com",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "keywords": [
     "salesforce",
     "salesforce.com",
