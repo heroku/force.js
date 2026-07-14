@@ -20,8 +20,8 @@
   "main": "index.js",
   "dependencies": {
     "request": "*",
-    "faye": "~0.8.3",
-    "mime": "~1.2.9"
+    "faye": "~1.4.0",
+    "mime": "~1.4.1"
   },
   "devDependencies": {
     "mocha": "*",
